@@ -8,6 +8,7 @@ import yfinance as yf
 start_date = '2020-01-01'
 end_date = '2020-03-20'
 zgpa = yf.download('601318.SS', start=start_date, end=end_date)
+zgpa.columns = zgpa.columns.get_level_values(0)
 #print(zgpa.head())
 
 zgpa_signal = pd.DataFrame(index = zgpa.index)
@@ -65,6 +66,27 @@ plt.plot(strategy['avg_5'], lw=2, ls='--', label='avg5')
 plt.plot(strategy['avg_10'], lw=2, ls='-.', label='avg10')
 plt.scatter(strategy.loc[strategy.order==1].index, zgpa['Close'][strategy.order==1], marker = '^', s=80, c='r', label='Buy')
 plt.scatter(strategy.loc[strategy.order==-1].index, zgpa['Close'][strategy.order==-1], marker = 'v', s=80, c='g', label='Sell')
+plt.legend()
+plt.grid()
+plt.show()
+
+#backtesting for dual moving average strategy
+initial_cash = 20000
+portfolio = pd.DataFrame(index = strategy.index)
+portfolio['stock'] = strategy['signal'] * 100
+
+stock_holdings = strategy['signal'].fillna(0) * 100
+
+portfolio['stock value'] =\
+        stock_holdings*zgpa['Close']
+order = portfolio['stock'].diff()
+portfolio['cash'] = initial_cash - order.multiply(zgpa['Close'], axis=0).cumsum()
+portfolio['total'] = portfolio['cash'] + portfolio['stock value']
+#print(portfolio.tail(10))
+
+plt.figure(figsize=(10,5))
+plt.plot(portfolio['total'], lw=2, label='total')
+plt.plot(portfolio['stock value'], lw=2, ls='--', label='stock value')
 plt.legend()
 plt.grid()
 plt.show()
