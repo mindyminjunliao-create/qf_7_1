@@ -48,4 +48,23 @@ plt.plot(zgpa['Close'], lw=2, c='k', label='stock price')
 plt.plot(zgpa['avg_10'], '--', lw=2, c='b', label='10_avg')
 plt.legend()
 plt.grid()
+#plt.show()
+
+#双移动平均策略 长期均线和短期均线 假设短期均线方向是股价动量移动方向
+strategy = pd.DataFrame(index = zgpa.index)
+strategy['signal'] = 0
+strategy['avg_5'] = zgpa['Close'].rolling(5).mean()
+strategy['avg_10'] = zgpa['Close'].rolling(10).mean()
+strategy['signal'] = np.where(strategy['avg_5'] > strategy['avg_10'], 1, 0)
+strategy['order'] = strategy['signal'].diff()
+#print(strategy.tail(10))
+
+plt.figure(figsize=(10,5))
+plt.plot(zgpa['Close'], lw=2, label='price')
+plt.plot(strategy['avg_5'], lw=2, ls='--', label='avg5')
+plt.plot(strategy['avg_10'], lw=2, ls='-.', label='avg10')
+plt.scatter(strategy.loc[strategy.order==1].index, zgpa['Close'][strategy.order==1], marker = '^', s=80, c='r', label='Buy')
+plt.scatter(strategy.loc[strategy.order==-1].index, zgpa['Close'][strategy.order==-1], marker = 'v', s=80, c='g', label='Sell')
+plt.legend()
+plt.grid()
 plt.show()
