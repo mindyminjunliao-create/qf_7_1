@@ -18,4 +18,28 @@ zgpa_signal['signal'] = np.where(zgpa_signal['diff'] >= 0, 0, 1)
 zgpa_signal['order'] = zgpa_signal['signal'].diff()*100
 #print(zgpa_signal.head())
 
+initial_cash = 20000.00
+zgpa_signal['stock'] = zgpa_signal['order']*zgpa_signal['price']
+zgpa_signal['cash'] = initial_cash -\
+        (zgpa_signal['order'].diff()*zgpa_signal['price']).cumsum()
+zgpa_signal['total'] = zgpa_signal['stock'] + zgpa_signal['cash']
 
+plt.figure(figsize=(10,6))
+plt.plot(zgpa_signal['total'])
+plt.plot(zgpa_signal['order'].cumsum()*zgpa_signal['price'], '--', label = 'stocke value')
+plt.grid()
+plt.legend(loc='center right')
+#plt.show()
+
+#单一平均移动指标
+period = 10
+avg_10 = []
+avg_value = []
+for price in zgpa['Close'].squeeze():
+    avg_10.append(price)
+    if len(avg_10) > period:
+          del avg_10[0]
+    avg_value.append(np.mean(avg_10))
+zgpa = zgpa.assign(avg_10 = pd.Series(avg_value, index = zgpa.index))
+print(zgpa.head())
+    
