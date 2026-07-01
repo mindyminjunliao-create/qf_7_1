@@ -41,5 +41,11 @@ for price in zgpa['Close'].squeeze():
           del avg_10[0]
     avg_value.append(np.mean(avg_10))
 zgpa = zgpa.assign(avg_10 = pd.Series(avg_value, index = zgpa.index))
-print(zgpa.head())
-    
+#print(zgpa.head())
+ 
+plt.figure(figsize=(10,6))
+plt.plot(zgpa['Close'], lw=2, c='k', label='stock price')
+plt.plot(zgpa['avg_10'], '--', lw=2, c='b', label='10_avg')
+plt.legend()
+plt.grid()
+plt.show()
