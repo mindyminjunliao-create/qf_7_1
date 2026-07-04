@@ -1,4 +1,4 @@
-from sklearn.em=nsemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor
 import jqdata
 from jqlib.technical_analysis import *
 import datetime
@@ -16,7 +16,7 @@ def set_params():
 def set_backtest():
     set_benchmark('000001.XSHG')
     set_option('use_real_price', True)
-    og.set_level('order', 'error')
+    log.set_level('order', 'error')
 
 def set_variables():
     g.days = 0
@@ -27,7 +27,7 @@ def before_trading_start(context):
     if g.days%g.tc==0:
         g.if_trade=True
         set_slip_fee(context)
-        g.stock=get_index_stocks('000300.XSHG')
+        g.stocks=get_index_stocks('000300.XSHG')
         g.feasible_stocks = set_feasible_stocks(g.stocks, context)
     g.days+=1
 
@@ -84,7 +84,7 @@ def stocks_to_buy(context):
     list_to_buy = []
     day1 = context.current_dt
     day2 = day1-datetime.timedelta(days=5)
-    hs300_close = get_price('00300.XSHE', day2, day1, fq='pre')['Close']
+    hs300_close = get_price('000300.XSHG', day2, day1, fq='pre')['close']
     hs300_ret = hs300_close[-1]/hs300_close[0]-1
 
     if hs300_ret > g.ret:
